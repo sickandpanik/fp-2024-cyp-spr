@@ -7,16 +7,17 @@ import Control.Monad (unless)
 import Data.List (sort)
 
 quickSort :: [Int] -> [Int]
-quickSort = id 
+quickSort [] = []
+quickSort (h:t) = quickSort [x | x <- t, x <= h] ++ [h] ++ quickSort [x | x <- t, x > h]
 
 map' :: (a -> b) -> [a] -> [b]
-map' = undefined 
+map' f = foldr (\x y -> (f x) : y) []
 
 concatMap' :: (a -> [b]) -> [a] -> [b]
-concatMap' = undefined 
+concatMap' f = foldr (\x y -> (f x) ++ y) []
 
 positions :: (a -> Bool) -> [a] -> [Int]
-positions = undefined 
+positions f xs = map snd (filter (f . fst) (zip xs [0..]))
 
 main = do
   runTests
