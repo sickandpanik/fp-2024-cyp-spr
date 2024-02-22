@@ -8,7 +8,7 @@ import Data.List (sort)
 
 quickSort :: [Int] -> [Int]
 quickSort [] = []
-quickSort (h:t) = quickSort [x | x <- t, x <= h] ++ [h] ++ quickSort [x | x <- t, x > h]
+quickSort (h:t) = quickSort [x | x <- t, x <= h] ++ (h : quickSort [x | x <- t, x > h])
 
 map' :: (a -> b) -> [a] -> [b]
 map' f = foldr (\x y -> (f x) : y) []
