@@ -13,8 +13,8 @@ data BinOperator = Exp | Mul | Div | Add | Sub
 instance Show Expr where 
   show (Const x) = show x
   show (Operation op) = case op of
-    (Sqrt e) -> "√(" ++ (show e) ++ ")"
-    (BinOp op e1 e2) -> "(" ++ (show e1) ++ ") " ++ (show op) ++ " (" ++ (show e2) ++ ")"
+    (Sqrt e) -> printf "√(%v)" (show e)
+    (BinOp op e1 e2) -> printf "(%v) %v (%v)" (show e1) (show op) (show e2)
 
 instance Show BinOperator where
   show op = case op of
