@@ -43,8 +43,8 @@ eval outerExpr@(Operation (Sqrt e)) = case eval e of
 eval outerExpr@(Operation (BinOp kind e1 e2)) = case (kind, eval e1, eval e2) of
   (_, error@(Left _), _) -> error
   (_, _, error@(Left _)) -> error
-  (Div, Right x, Right y) | y == 0 -> Left (Error DivisionByZero outerExpr)
-  (Exp, Right x, Right y) | x < 0 -> Left (Error RealPowerOfNegativeNumber outerExpr)
+  (Div, _, Right y) | y == 0 -> Left (Error DivisionByZero outerExpr)
+  (Exp, Right x, _) | x < 0 -> Left (Error RealPowerOfNegativeNumber outerExpr)
   (_, Right x, Right y) -> Right (binOperatorToFunction kind x y)
 
 binOperatorToFunction binOp = case binOp of
