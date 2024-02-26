@@ -4,8 +4,10 @@ import Text.Printf (printf)
 import Control.Monad (unless)
 
 data Expr = Const Double | Operation Op
+  deriving Eq
 
 data Op = Sqrt Expr | BinOp BinOperator Expr Expr
+  deriving Eq
 
 data BinOperator = Exp | Mul | Div | Add | Sub
   deriving Eq
@@ -24,17 +26,10 @@ instance Show BinOperator where
     Add -> "+"
     Sub -> "-"
 
-instance Eq Expr where 
-  (==) (Const x1) (Const x2) = x1 == x2
-  (==) (Operation (Sqrt e1)) (Operation (Sqrt e2)) = e1 == e2
-  (==) (Operation (BinOp op1 lhs1 rhs1)) (Operation (BinOp op2 lhs2 rhs2)) = 
-    (op1 == op2) && (lhs1 == lhs2) && (rhs1 == rhs2)
-  (==) _ _ = False
-
 data Error = Error ErrorKind Expr
   deriving Eq
 
-data ErrorKind = DivisionByZero | NegativeNumberSquareRoot
+data ErrorKind = DivisionByZero | NegativeNumberSquareRoot | RealPowerOfNegativeNumber
   deriving (Eq, Show)
 
 instance Show Error where 
@@ -44,12 +39,13 @@ eval :: Expr -> Either Error Double
 eval (Const x) = Right x
 eval outerExpr@(Operation (Sqrt e)) = case eval e of
   error@(Left _) -> error
-  (Right x) -> if (x >= 0) then (Right (sqrt x)) else (Left (Error NegativeNumberSquareRoot outerExpr))
+  Right x -> if x >= 0 then Right (sqrt x) else Left (Error NegativeNumberSquareRoot outerExpr)
 eval outerExpr@(Operation (BinOp kind e1 e2)) = case (kind, eval e1, eval e2) of
   (_, error@(Left _), _) -> error
   (_, _, error@(Left _)) -> error
-  (Div, (Right x), (Right y)) -> if (y /= 0) then (Right (x / y)) else (Left (Error DivisionByZero outerExpr))
-  (_, (Right x), (Right y)) -> Right ((binOperatorToFunction kind) x y)
+  (Div, Right x, Right y) | y == 0 -> Left (Error DivisionByZero outerExpr)
+  (Exp, Right x, Right y) | x < 0 -> Left (Error RealPowerOfNegativeNumber outerExpr)
+  (_, Right x, Right y) -> Right (binOperatorToFunction kind x y)
 
 binOperatorToFunction binOp = case binOp of
   Exp -> (**)
@@ -65,6 +61,8 @@ cases =
       (expr, Left (Error DivisionByZero expr)),
     let expr = Operation (Sqrt (Const (-1))) in -- √(-1)
       (expr, Left (Error NegativeNumberSquareRoot expr)),
+    let expr = Operation (BinOp Exp (Const (-1)) (Const 0.5)) in -- (-1)^(1/2)
+      (expr, Left (Error RealPowerOfNegativeNumber expr)),
     (Operation (BinOp Add (Const 2) (Operation (BinOp Mul (Const 2) (Const 2)))), Right 6.0), -- 2 + 2 * 2
     (Operation (BinOp Exp (Const 2) (Operation (BinOp Div (Const 1) (Const 2)))), Right (sqrt 2.0)), -- 2^(1/2)
     (Operation (BinOp Exp (Const 5) (Const (-1))), Right 0.2), -- 5^(-1)
