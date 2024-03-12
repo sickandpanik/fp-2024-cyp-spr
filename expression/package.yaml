@@ -23,6 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - containers
 - tasty
+- tasty-hunit
 
 ghc-options:
 - -Wall

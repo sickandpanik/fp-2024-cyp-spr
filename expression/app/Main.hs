@@ -4,4 +4,4 @@ import Lib
 
 main :: IO ()
 main = do
-    mapM_ test cases
+    putStrLn "Expressions"
