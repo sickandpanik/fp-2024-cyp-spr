@@ -4,6 +4,8 @@ import Text.Printf (printf)
 import Prelude hiding (lookup)
 import Data.Map.Strict (Map, empty, lookup, fromList)
 
+import Expr
+import Error
 import Lib
 
 main :: IO ()

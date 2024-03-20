@@ -1,48 +1,10 @@
-module Lib where
+module Lib (eval, simplify) where
 
 import Prelude hiding (lookup)
-import Text.Printf (printf)
-import Control.Monad (unless)
-import Data.Map.Strict (Map, empty, lookup, fromList)
+import Data.Map.Strict (Map, lookup)
 
-data Expr a = Const a | Var String | Operation (Op a)
-  deriving Eq
-
-data Op a = Sqrt (Expr a) | BinOp BinOperator (Expr a) (Expr a)
-  deriving Eq
-
-data BinOperator = Exp | Mul | Div | Add | Sub
-  deriving Eq
-
-instance (Num a) => Num (Expr a) where
-    (+) lhs rhs = Operation (BinOp Add lhs rhs)
-    (*) lhs rhs = Operation (BinOp Mul lhs rhs)
-    (-) lhs rhs = Operation (BinOp Sub lhs rhs)
-    fromInteger int = Const (fromInteger int)
-
-instance (Show a) => Show (Expr a) where
-  show (Const x) = show x
-  show (Var varName) = varName
-  show (Operation op) = case op of
-    (Sqrt e) -> printf "√(%s)" (show e)
-    (BinOp op e1 e2) -> printf "(%s) %s (%s)" (show e1) (show op) (show e2)
-
-instance Show BinOperator where
-  show op = case op of
-    Exp -> "^"
-    Mul -> "*"
-    Div -> "/"
-    Add -> "+"
-    Sub -> "-"
-
-data Error a = Error ErrorKind (Expr a)
-  deriving Eq
-
-data ErrorKind = DivisionByZero | NegativeNumberSquareRoot | RealPowerOfNegativeNumber | UnknownVariable
-  deriving (Eq, Show)
-
-instance (Show a) => Show (Error a) where
-  show (Error kind expr) = printf "ERROR: %s in %s" (show kind) (show expr)
+import Expr
+import Error
 
 eval :: (Ord a, Floating a) => Expr a -> Map String a -> Either (Error a) a
 eval (Const x) _ = Right x
