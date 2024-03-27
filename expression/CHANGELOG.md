@@ -1,4 +1,4 @@
-# Changelog for `hw07`
+# Changelog for `expression`
 
 All notable changes to this project will be documented in this file.
 
