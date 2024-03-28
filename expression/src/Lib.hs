@@ -1,4 +1,4 @@
-module Lib (eval, simplify) where
+module Lib (eval, simplify, containsVariables) where
 
 import Prelude hiding (lookup)
 import Data.Map.Strict (Map, lookup)
@@ -23,6 +23,13 @@ eval expr = do
       (Exp, Right x, _) | x < 0 -> Left (Error RealPowerOfNegativeNumber outerExpr)
       (_, Right x, Right y) -> Right (binOperatorToFunction kind x y)
       (_, error, _) -> error
+      
+binOperatorToFunction binOp = case binOp of
+  Exp -> (**)
+  Mul -> (*)
+  Div -> (/)
+  Add -> (+)
+  Sub -> (-)
 
 simplify :: (Eq a, Num a) => Expr a -> Expr a
 simplify (Operation (BinOp Mul _ (Const 0))) = Const 0
@@ -30,9 +37,9 @@ simplify (Operation (BinOp Mul (Const 0) _)) = Const 0
 simplify (Operation (BinOp Add (Const 0) rhs)) = rhs
 simplify (Operation (BinOp Add lhs (Const 0))) = lhs
 
-binOperatorToFunction binOp = case binOp of
-  Exp -> (**)
-  Mul -> (*)
-  Div -> (/)
-  Add -> (+)
-  Sub -> (-)
+containsVariables :: Expr a -> Bool
+containsVariables expr = case expr of
+  Var _ -> True
+  Operation (Sqrt e) -> containsVariables e
+  Operation (BinOp _ e1 e2) -> containsVariables e1 || containsVariables e2
+  _ -> False
