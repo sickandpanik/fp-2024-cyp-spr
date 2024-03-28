@@ -10,7 +10,6 @@ import Lib
 import Parser
 import ExprParser
 import ParsingError
-import Expr (Expr(Operation))
 
 main :: IO ()
 main = defaultMain tests
