@@ -3,22 +3,26 @@ module Lib (eval, simplify) where
 import Prelude hiding (lookup)
 import Data.Map.Strict (Map, lookup)
 
+import StateDemo
 import Expr
 import Error
 
-eval :: (Ord a, Floating a) => Expr a -> Map String a -> Either (Error a) a
-eval (Const x) _ = Right x
-eval var@(Var varName) vars = case lookup varName vars of
-  Nothing -> Left (Error UnknownVariable var)
-  Just value -> Right value
-eval outerExpr@(Operation (Sqrt e)) vars = case eval e vars of
-  error@(Left _) -> error
-  Right x -> if x >= 0 then Right (sqrt x) else Left (Error NegativeNumberSquareRoot outerExpr)
-eval outerExpr@(Operation (BinOp kind e1 e2)) vars = case (kind, eval e1 vars, eval e2 vars) of
-  (Div, _, Right y) | y == 0 -> Left (Error DivisionByZero outerExpr)
-  (Exp, Right x, _) | x < 0 -> Left (Error RealPowerOfNegativeNumber outerExpr)
-  (_, Right x, Right y) -> Right (binOperatorToFunction kind x y)
-  (_, error, _) -> error
+eval :: (Ord a, Floating a) => Expr a -> State (Map String a) (Either (Error a) a)
+eval expr = do
+  state <- get
+  return $ case expr of
+    (Const x) -> Right x
+    var@(Var varName) -> case lookup varName state of
+      Nothing -> Left (Error UnknownVariable var)
+      Just value -> Right value
+    outerExpr@(Operation (Sqrt e)) -> case execState (eval e) state of
+        Right x -> if x >= 0 then Right (sqrt x) else Left (Error NegativeNumberSquareRoot outerExpr)
+        error -> error
+    outerExpr@(Operation (BinOp kind e1 e2)) -> case (kind, execState (eval e1) state, execState (eval e2) state) of
+      (Div, _, Right y) | y == 0 -> Left (Error DivisionByZero outerExpr)
+      (Exp, Right x, _) | x < 0 -> Left (Error RealPowerOfNegativeNumber outerExpr)
+      (_, Right x, Right y) -> Right (binOperatorToFunction kind x y)
+      (_, error, _) -> error
 
 simplify :: (Eq a, Num a) => Expr a -> Expr a
 simplify (Operation (BinOp Mul _ (Const 0))) = Const 0

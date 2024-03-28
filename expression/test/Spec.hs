@@ -4,6 +4,7 @@ import Text.Printf (printf)
 import Prelude hiding (lookup)
 import Data.Map.Strict (Map, empty, lookup, fromList)
 
+import StateDemo
 import Expr
 import Error
 import Lib
@@ -35,7 +36,7 @@ constructCaseNoTest :: (Expr Double, Either (Error Double) Double) -> ExprTestCa
 constructCaseNoTest (expr, exp) = ExprTestCase expr empty exp
 
 convertCaseToHUnit :: ExprTestCase -> TestTree
-convertCaseToHUnit (ExprTestCase expr vars expect) = testCase (printf "%s @?= %s" (show expr) (show expect)) (eval expr vars @?= expect)
+convertCaseToHUnit (ExprTestCase expr vars expect) = testCase (printf "%s @?= %s" (show expr) (show expect)) (execState (eval expr) vars @?= expect)
 
 evalCases :: [ExprTestCase]
 evalCases =
