@@ -15,11 +15,10 @@ eval outerExpr@(Operation (Sqrt e)) vars = case eval e vars of
   error@(Left _) -> error
   Right x -> if x >= 0 then Right (sqrt x) else Left (Error NegativeNumberSquareRoot outerExpr)
 eval outerExpr@(Operation (BinOp kind e1 e2)) vars = case (kind, eval e1 vars, eval e2 vars) of
-  (_, error@(Left _), _) -> error
-  (_, _, error@(Left _)) -> error
   (Div, _, Right y) | y == 0 -> Left (Error DivisionByZero outerExpr)
   (Exp, Right x, _) | x < 0 -> Left (Error RealPowerOfNegativeNumber outerExpr)
   (_, Right x, Right y) -> Right (binOperatorToFunction kind x y)
+  (_, error, _) -> error
 
 simplify :: (Eq a, Num a) => Expr a -> Expr a
 simplify (Operation (BinOp Mul _ (Const 0))) = Const 0

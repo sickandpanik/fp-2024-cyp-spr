@@ -46,37 +46,3 @@ modify :: (s -> s) -> State s ()
 modify f = do
   s <- get
   put (f s)
-
--- replicateM :: Applicative m => Int -> m a -> m [a]
--- replicateM n act performs the action act n times, and then returns the list of results:
-efficientFib :: Int -> Int
-efficientFib n =
-    last $ execState (replicateM n step) (0,1)
-  where
-    step = do
-      (a, b) <- get
-      put (b, a+b)
-      return b
-
--- type -- type synonym 
-type Random a = State Integer a
-
-nextNumber :: Integral a => a -> a
-nextNumber n =  (6364136223846793005 * n + 1442695040888963407) `mod` (2^64) 
-
--- -- This function returns the new random number, whereas the next function returns the current one
--- fresh :: Random Integer 
--- fresh = do 
---   n <- get 
---   let next = (nextNumber n :: Integer)
---   put next 
---   return next 
-
-fresh :: Random Integer
-fresh = do 
-  n <- get 
-  modify nextNumber 
-  return n  
-
-runPRNG :: Random a -> Integer -> a
-runPRNG = execState 

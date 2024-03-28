@@ -27,8 +27,10 @@ library
   exposed-modules:
       Error
       Expr
+      ExprParser
       Lib
       Parser
+      ParsingError
       StateDemo
   other-modules:
       Paths_expression

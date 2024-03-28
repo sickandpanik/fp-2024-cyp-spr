@@ -11,6 +11,14 @@ data Op a = Sqrt (Expr a) | BinOp BinOperator (Expr a) (Expr a)
 data BinOperator = Exp | Mul | Div | Add | Sub
   deriving Eq
 
+instance Show BinOperator where
+  show op = case op of
+    Exp -> "^"
+    Mul -> "*"
+    Div -> "/"
+    Add -> "+"
+    Sub -> "-"
+
 instance (Num a) => Num (Expr a) where
     (+) lhs rhs = Operation (BinOp Add lhs rhs)
     (*) lhs rhs = Operation (BinOp Mul lhs rhs)
@@ -23,11 +31,3 @@ instance (Show a) => Show (Expr a) where
   show (Operation op) = case op of
     (Sqrt e) -> printf "√(%s)" (show e)
     (BinOp op e1 e2) -> printf "(%s) %s (%s)" (show e1) (show op) (show e2)
-
-instance Show BinOperator where
-  show op = case op of
-    Exp -> "^"
-    Mul -> "*"
-    Div -> "/"
-    Add -> "+"
-    Sub -> "-"
