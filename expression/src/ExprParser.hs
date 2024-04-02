@@ -7,11 +7,17 @@ import Expr
 import Parser
 import ParsingError
 
+delim = " "
+
+binOperatorsString = concatMap show (enumFrom minBound :: [BinOperator])
+
+binOperatorsMap = map (\x -> (show x, x)) (enumFrom minBound :: [BinOperator])
+
 parseDigit :: Parser Char
 parseDigit = satisfy isDigit
 
 parseIdentChar :: Parser Char
-parseIdentChar = satisfy $ \c -> c `notElem` " +-*/^"
+parseIdentChar = satisfy $ \c -> c `notElem` delim ++ binOperatorsString
 
 digitsToNumber :: String -> Int
 digitsToNumber = foldl1 (\a x -> a * 10 + x) . map digitToInt
@@ -42,33 +48,27 @@ parseUnaryOp = do
     "sqrt" -> return ident
     _ -> errorParser Unexpected
 
-parseBinOp :: Parser String
-parseBinOp = do
-  op <- satisfy $ \c -> c `elem` "+-*/^"
-  return [op]
+parseBinOperator :: Parser BinOperator
+parseBinOperator = do
+  opString <- satisfy $ \c -> c `elem` binOperatorsString
+  case lookup [opString] binOperatorsMap of
+    Just op -> return op
+    Nothing -> errorParser Unexpected
 
-parseExpr :: Parser (Expr Double) 
+parseExpr :: Parser (Expr Double)
 parseExpr = parseConst <|> parseVar <|>
-  (do 
+  (do
     parseUnaryOp
     satisfy (== ' ')
     nestedExpr <- parseExpr
     return $ Operation (Sqrt nestedExpr)
   )
   <|>
-  (do 
-    op <- parseBinOp
+  (do
+    op <- parseBinOperator
     satisfy (== ' ')
     lhs <- parseExpr
     satisfy (== ' ')
     rhs <- parseExpr
-    return $ Operation (BinOp (opStringToConstructor op) lhs rhs)
+    return $ Operation (BinOp op lhs rhs)
   )
-
-opStringToConstructor :: String -> BinOperator
-opStringToConstructor s = case s of
-  "+" -> Add
-  "-" -> Sub
-  "*" -> Mul
-  "/" -> Div
-  "^" -> Exp

@@ -100,11 +100,11 @@ parseUnaryOpCases = testGroup "parseUnaryOp" $ map (uncurry testCase) [
   , ("Break when identifier is not valid unary op", runParser parseUnaryOp "aabb" @?= Left Unexpected)
   ]
 
-parseBinOpCases = testGroup "parseBinOp" $ map (uncurry testCase) [
-    ("Parse '+'", runParser parseBinOp "+" @?= Right ("", "+"))
-  , ("Parse '/ '", runParser parseBinOp "/ " @?= Right (" ", "/"))
-  , ("Break on every other character", runParser parseBinOp "::::::" @?= Left Unexpected)
-  , ("Break on empty string", runParser parseBinOp "" @?= Left Unexpected)
+parseBinOpCases = testGroup "parseBinOperator" $ map (uncurry testCase) [
+    ("Parse '+'", runParser parseBinOperator "+" @?= Right ("", Add))
+  , ("Parse '/ '", runParser parseBinOperator "/ " @?= Right (" ", Div))
+  , ("Break on every other character", runParser parseBinOperator "::::::" @?= Left Unexpected)
+  , ("Break on empty string", runParser parseBinOperator "" @?= Left Unexpected)
   ]
 
 parseExprCases = testGroup "parseExpr" $ map (uncurry testCase) [

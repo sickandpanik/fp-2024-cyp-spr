@@ -9,7 +9,7 @@ data Op a = Sqrt (Expr a) | BinOp BinOperator (Expr a) (Expr a)
   deriving Eq
 
 data BinOperator = Exp | Mul | Div | Add | Sub
-  deriving Eq
+  deriving (Eq, Enum, Bounded)
 
 instance Show BinOperator where
   show op = case op of
