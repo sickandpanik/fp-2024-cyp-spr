@@ -8,14 +8,15 @@ import Expr.AST
 import Expr.Combinators
 import Control.Applicative ((<|>))
 
--- Expr :: Expr - Expr | Expr + Expr (Левоассоциативно)
---       | Expr * Expr | Expr / Expr (Левоассоциативно)
---       | Expr ^ Expr               (Правоассоциативно)
+-- Expr :: Expr - Expr | Expr + Expr (Left associative)
+--       | Expr * Expr | Expr / Expr (Left associative)
+--       | Expr ^ Expr               (Right associative)
 --       | Digit
 --       | ( Expr )
--- Expr :: Слаг + Слаг + ... + Слаг
--- Слаг :: Множ (* Множ) * ... (* Множ) -> [Expr]
--- Множ :: Цифра | Выражение в скобках
+-- Expr :: Mult + Mult + ... + Mult
+-- Mult :: Pow (* Pow) * ... (* Pow) 
+-- Pow  :: Base (^ Base ^ ... ^ Base)
+-- Base :: Integer | (Expr)
 parse :: String -> Maybe (String, Expr)
 parse = runParser (spaces *> parseExpr)
 

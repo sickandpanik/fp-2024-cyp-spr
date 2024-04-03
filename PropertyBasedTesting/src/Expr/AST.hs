@@ -38,5 +38,3 @@ printInfix (Number n) = show n
 printPrefix :: Expr -> String
 printPrefix (BinOp op l r) = printf "%s %s %s" (printOp op) (printPrefix l) (printPrefix r)
 printPrefix (Number n) = show n
-
--- parser (printer expr) == expr

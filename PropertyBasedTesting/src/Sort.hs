@@ -4,7 +4,7 @@ sort :: [Int] -> [Int]
 sort [] = []
 sort (h:t) =
   let smaller = sort [x | x <- t, x < h]
-      greater = sort [x | x <- t, x > h]
+      greater = sort [x | x <- t, x >= h]
   in smaller ++ h : greater
 
 isSorted :: Ord a => [a] -> Bool

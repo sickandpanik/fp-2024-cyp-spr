@@ -9,66 +9,65 @@ import Test.Tasty.Hedgehog
 import Data.List (sort)
 import List
 
--- Это пример использования Hedgehog для property-based тестирования.
--- В этом фреймворке тестирование происходит таким образом:
--- * генерируются входные данные
--- * на входных данных запускается тестируемая функция и проверяется выполнение некоторого свойства
--- * если свойство не выполняется, входные данные минимизируются таким образом,
---   чтобы тест все еще падал, но вход было легко использовать для отладки
+-- This is an example of using Hedgehog for property-based testing. 
+-- In this framework, testing is done in three steps: 
+-- * The input is generated 
+-- * The function under test is run on the generated input and a property is checked. 
+-- * If a property is not held then the input is shrunk in such a way that the test 
+--   still fails, but the input is easy to use in Debugging. 
 
--- Тут мы проверяем несколько функций для работы на списках.
+-- Here we test several functions over lists
 
--- Генератор целых чисел от 0 до 100.
+-- Generator of integer numbers from 0 to 100. 
 genInt :: Gen Int
 genInt = Gen.int (Range.constant 0 100)
--- Range.constant генерирует значения вне зависимости от Size.
+-- Range.constant generates values disregarding the size parameter. 
 
--- Если хочется генерировать некоторые значения чаще, чем другие,
--- или чтобы генерируемые значения зависели от Size, стоит пользоваться
--- Range.linear, Range.linearFromSource, Range.exponential или другими
+-- If we want to generate some values more often than the other 
+-- we can make them depend on the Size parameter. 
+-- Use Range.linear, Range.linearFromSource, Range.exponential and others (Hoogle them). 
 
-
--- Генерация списков целых чисел с длинами от minLength до maxLength
+-- Generator of lists of integer numbers with the length from minLength to maxLength
 genList :: Int -> Int -> Gen [Int]
 genList minLength maxLength = Gen.list (Range.constant minLength maxLength) genInt
 
--- Проверяем, что все элементы списка не больше, чем максимальное
+-- Every element of a list is not greater than its maximum. 
 prop_maximum :: Property
 prop_maximum = property $ do
   list <- forAll $ genList 1 100
   let maxValue = maximumValue list
   assert (all (<= maxValue) list)
 
--- Проверяем, что все элементы списка не меньше, чем минимальное
+-- Every element of a list is not less than the maximum. 
 prop_minimum :: Property
 prop_minimum = property $ do
   list <- forAll $ genList 1 100
   let minValue = minimumValue list
   assert (all (>= minValue) list)
 
--- Генерируем отсортированные списки: генерируем обычные списки и сортируем их
+-- To generate a sorted list, generate a random list and sort it (with a trusted library function)
 genSortedList :: Int -> Int -> Gen (SortedList Int)
 genSortedList minLength maxLength = Sorted . sort <$> genList minLength maxLength
 
--- Проверяем, что minimumValue работает одинаково на отсортированных и обычных списках
+-- MinimumValue works the same on normal and sorted lists. 
 prop_minimumSorted :: Property
 prop_minimumSorted = property $ do
   list <- forAll $ genSortedList 1 100
   minimumValue list === minimumValue (getSorted list)
 
--- Проверяем, что maximumValue работает одинаково на отсортированных и обычных списках
+-- MaximumValue works the same on normal and sorted lists. 
 prop_maximumSorted :: Property
 prop_maximumSorted = property $ do
   list <- forAll $ genSortedList 1 100
   maximumValue list === maximumValue (getSorted list)
 
--- Проверяем, что дважды обернув список получаем исходный
+-- By reversing a list twice we get the same result.
 prop_reverseList :: Property
 prop_reverseList = property $ do
   list <- forAll $ genList 1 100
   reverseList (reverseList list) === list
 
--- Проверяем, что быстрая версия обращения списка работает так же, как эталонная
+-- Fast reversal works as efficient as the trivial one.
 prop_fastReverseList :: Property
 prop_fastReverseList = property $ do
   list <- forAll $ genList 1 100

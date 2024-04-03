@@ -10,27 +10,29 @@ import Expr.AST
 import qualified Expr.Infix as Infix
 import qualified Expr.Prefix as Prefix
 
--- Тут мы проверяем, что парсеры для арифметических выражений написаны корректно.
--- Генерировать осмысленные входные строки просто так не получится,
--- поэтому мы генерируем выражения, дальше преобразовываем их в строку и запускаем на них парсер.
--- Это не идеально, потому что принтер печатает строки только одним способом, а пользователи
--- могут писать то же выражение сотней разных способов, но это лучше, чем ничего :)
+-- Here we check that parsers for arythmetics are correct. 
+-- It's non-trivial how to generate strings which are likely to be parsed as expressions. 
+-- Instead, we generate expressions which are printed into strings, and then parsed. 
+-- This is not an ideal solution, because the printer works in one particular way, while 
+-- users can do whatever they want. 
+-- However this is better than nothing. 
 
--- Для простых типов данных генератор выбирает одно из возможных значений
+-- For the simplest types, the generator just picks a random value from the list. 
 genOp :: Gen Op
 genOp = Gen.element [Plus, Minus, Mult, Div, Pow]
 
--- Чтобы написать генератор для рекурсивного алгебраического типа данных,
--- который генерирует разнообразные значения, стоит использвать Gen.recursive и Gen.subterm
+-- To generate a recursive algebraic data type, use Gen.recursive and Gen.subterm
 genExpr :: Int -> Gen Expr
 genExpr n =
   Gen.recursive
     Gen.choice
-    [ -- нерекурсивные генераторы
+    [ -- non-recursive generators
       numGen
+    -- , varGen
     ]
-    [ -- рекурсивные генераторы
+    [ -- recursive generators
       binOpGen
+    -- , unOpGen 
     ]
   where
     numGen = Number <$> Gen.int (Range.constant 0 n)
@@ -45,13 +47,11 @@ parserPrinterIsId printer parser ast =
     Just ("", r) -> r === ast
     _ -> failure
 
--- Проверяем инфиксный парсер
 prop_printerParserInfix :: Property
 prop_printerParserInfix = property $ do
   expr <- forAll $ genExpr 100
   parserPrinterIsId printInfix Infix.parse expr
 
--- Проверяем префиксный парсер
 prop_printerParserPrefix :: Property
 prop_printerParserPrefix = property $ do
   expr <- forAll $ genExpr 100

@@ -31,7 +31,6 @@ library
       Expr.Lexer
       Expr.Parser
       Expr.Prefix
-      Lib
       List
       Sort
   other-modules:

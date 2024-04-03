@@ -1,13 +1,14 @@
 {-# LANGUAGE InstanceSigs #-}
 module List where
 
--- Класс типов для контейнеров, в которых можно найти минимальный и максимальный элемент
+-- Type class for containers with known minimum and maximum values 
 class Ranged t where
   maximumValue :: Ord a => t a -> a
   minimumValue :: Ord a => t a -> a
 
--- Обычные списки мы просто обходим и ищем максимальное и минимальное значения в процессе
+-- When working with a simple list, we traverse it to find the min and max values
 instance Ranged [] where
+  maximumValue :: Ord a => [a] -> a
   maximumValue xs =
       go (head xs) (tail xs)
     where
@@ -15,6 +16,7 @@ instance Ranged [] where
       go curMax (h : t) | h > curMax = go h t
                         | otherwise = go curMax t
 
+  minimumValue :: Ord a => [a] -> a
   minimumValue xs =
       go (head xs) (tail xs)
     where
@@ -22,20 +24,23 @@ instance Ranged [] where
       go curMax (h : t) | h < curMax = go h t
                         | otherwise = go curMax t
 
--- Тип данных для отсортированных списков
+-- Data types for sorted lists
 newtype SortedList a = Sorted { getSorted :: [a] } deriving (Show, Eq)
 
--- Для отсортированных списков минимальное и максимальное значения всегда на концах списка
+-- When a list is sorted, its min values is the first element, and the max value is in the last position
 instance Ranged SortedList where
+  maximumValue :: Ord a => SortedList a -> a
   maximumValue = last . getSorted
+  
+  minimumValue :: Ord a => SortedList a -> a
   minimumValue = head . getSorted
 
--- Эталонная реализация обращения списка, для которой очевидно, что она работает корректно
+-- Etalon reversal
 reverseList :: [a] -> [a]
 reverseList [] = []
 reverseList (h : t) = reverseList t ++ [h]
 
--- Более эффективная реализация обращения списка
+-- More efficient reversal
 fastReverseList :: [a] -> [a]
 fastReverseList =
     go []
