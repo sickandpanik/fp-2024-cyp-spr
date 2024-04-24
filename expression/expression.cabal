@@ -42,7 +42,9 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , hedgehog
     , tasty
+    , tasty-hedgehog
     , tasty-hunit
   default-language: Haskell2010
 
@@ -59,14 +61,18 @@ executable expression-exe
       base >=4.7 && <5
     , containers
     , expression
+    , hedgehog
     , tasty
+    , tasty-hedgehog
     , tasty-hunit
   default-language: Haskell2010
 
 test-suite expression-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: Test.hs
   other-modules:
+      Property
+      Unit
       Paths_expression
   autogen-modules:
       Paths_expression
@@ -77,6 +83,8 @@ test-suite expression-test
       base >=4.7 && <5
     , containers
     , expression
+    , hedgehog
     , tasty
+    , tasty-hedgehog
     , tasty-hunit
   default-language: Haskell2010

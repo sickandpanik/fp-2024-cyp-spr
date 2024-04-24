@@ -1,3 +1,5 @@
+module Unit where
+
 import Test.Tasty
 import Test.Tasty.HUnit
 import Text.Printf (printf)
@@ -12,11 +14,7 @@ import Parser
 import ExprParser
 import ParsingError
 
-main :: IO ()
-main = defaultMain tests
-
-tests = testGroup "Tests" [evalTests, parserTests]
-
+unitTests = testGroup "Unit Tests" [evalTests, parserTests]
 
 -- ## eval tests
 

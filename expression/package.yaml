@@ -24,6 +24,8 @@ dependencies:
 - containers
 - tasty
 - tasty-hunit
+- hedgehog
+- tasty-hedgehog
 
 ghc-options:
 - -Wall
@@ -52,7 +54,7 @@ executables:
 
 tests:
   expression-test:
-    main:                Spec.hs
+    main:                Test.hs
     source-dirs:         test
     ghc-options:
     - -threaded
