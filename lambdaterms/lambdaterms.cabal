@@ -27,6 +27,7 @@ library
   exposed-modules:
       Lib
       LTerm
+      LTermParser
   other-modules:
       Paths_lambdaterms
   autogen-modules:
@@ -36,7 +37,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
-    , parser-combinators
+    , parsec
     , tasty
     , tasty-hunit
   default-language: Haskell2010
@@ -53,7 +54,7 @@ executable lambdaterms-exe
   build-depends:
       base >=4.7 && <5
     , lambdaterms
-    , parser-combinators
+    , parsec
     , tasty
     , tasty-hunit
   default-language: Haskell2010
@@ -71,7 +72,7 @@ test-suite lambdaterms-test
   build-depends:
       base >=4.7 && <5
     , lambdaterms
-    , parser-combinators
+    , parsec
     , tasty
     , tasty-hunit
   default-language: Haskell2010
